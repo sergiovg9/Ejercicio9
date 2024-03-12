@@ -26,7 +26,7 @@ class CatViewModel:ViewModel(){
          viewModelScope.launch {
             catUiState = try {
                  val listResult = CatApi.retrofitService.getPhotos()
-                CatUiState.Success(listResult)
+                CatUiState.Success("Number of photos is ${listResult.size}")
              } catch (e: IOException){
                  CatUiState.Error
              }
