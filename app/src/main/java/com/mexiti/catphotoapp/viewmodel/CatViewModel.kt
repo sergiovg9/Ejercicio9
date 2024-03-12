@@ -7,19 +7,30 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mexiti.catphotoapp.network.CatApi
 import kotlinx.coroutines.launch
+import java.io.IOException
 
+sealed interface CatUiState{
+    data class Success(val photos:String) : CatUiState
+    object Error: CatUiState
+    object Loading: CatUiState
+}
 class CatViewModel:ViewModel(){
-    var catUiState  by mutableStateOf("")
+    var catUiState:CatUiState  by mutableStateOf(CatUiState.Loading)
         private set
 
     init{
         getCatPhotos()
     }
 
-     fun getCatPhotos(){
+   private  fun getCatPhotos(){
          viewModelScope.launch {
-             val listResult = CatApi.retrofitService.getPhotos()
-             catUiState = listResult
+            catUiState = try {
+                 val listResult = CatApi.retrofitService.getPhotos()
+                CatUiState.Success(listResult)
+             } catch (e: IOException){
+                 CatUiState.Error
+             }
+
          }
     }
 
